@@ -6,10 +6,6 @@ const mongoose = require('mongoose');
 const date = require(__dirname+'/date.js');
 const app = express();
 
-
-var items = ['eat more'];
-var workItems = ['work'];
-
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
@@ -47,10 +43,19 @@ Item.insertMany(defaultItems,function(err){
 
 app.get("/",function(req,res){ 
 
-    let day = date();
-
-    res.render('list',{listTitle:day, newListItem:items});
+    Item.find({},function(err,foundItems){
+    if(foundItems.length === 0){ 
+        Item.insertMany(defaultItems,function(err){
+            if(err){
+                console.log(err);
+            }else{
+                console.log("added to db");
+            }
+        });
+    }  res.render('list',{listTitle:'Today',newListItem:foundItems});
 });
+});
+
 
 app.post("/",function(req,res){
     let item = req.body.newItem;
@@ -73,6 +78,6 @@ app.get("/work",function(req,res){
 //     res.redirect('/work');
 // })
 
-app.listen(4000,function(){
-    console.log("server is running");
-});
+app.listen(3000,function(){
+    console.log('server running');
+})
