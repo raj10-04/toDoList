@@ -52,22 +52,32 @@ app.get("/",function(req,res){
                 console.log("added to db");
             }
         });
-    }  res.render('list',{listTitle:'Today',newListItem:foundItems});
-});
+        res.redirect('/');
+    } else{
+     res.render('list',{listTitle:'Today',newListItem:foundItems});
+    }
+    });
 });
 
 
 app.post("/",function(req,res){
-    let item = req.body.newItem;
-    console.log(req.body.list);
-    if (req.body.list==="Work"){
-        workItems.push(item);
-        res.redirect('/work');
-    }else{
-        items.push(item);
-        res.redirect('/');
-    }
- });
+    let itemName = req.body.newItem;
+
+    const item=new Item({
+        name: itemName
+    });
+    item.save();
+    res.redirect('/');
+});
+
+app.post('/delete',function(req,res){
+    const checkedItemId = req.body.checkbox;
+    Item.findByIdAndRemove(checkedItemId, function(err){
+        if(!err){
+            console.log('Sucessfully deleted');
+        }
+    });
+})
 
 app.get("/work",function(req,res){
     res.render('list',{listTitle:"Work Lists", newListItem:workItems});
@@ -78,6 +88,6 @@ app.get("/work",function(req,res){
 //     res.redirect('/work');
 // })
 
-app.listen(3000,function(){
+app.listen(1000,function(){
     console.log('server running');
 })
